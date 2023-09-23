@@ -36,12 +36,26 @@ variable "instance_count" {
   default     = 1
 }
 
+#公開鍵の場所
+variable "pub_key_location" {
+  description = "Location of public key"
+  default     = "~/.ssh/isucon.pub"
+}
+
+
+
+
+resource "aws_key_pair" "isucon" {
+  key_name   = "isucon"
+  # `ssh-keygen`コマンドで作成した公開鍵を指定
+  public_key = file(var.pub_key_location)
+}
 
 resource "aws_instance" "private-isu" {
   count           = var.instance_count
   ami             = "ami-0d92a4724cae6f07b" # 適切なAMI IDを指定
   instance_type   = "c6i.large"
-  key_name        = "isucon12-final2" #お好きなキーペアを指定
+  key_name               = aws_key_pair.isucon.id
   vpc_security_group_ids = [
     module.http_sg.security_group_id,
     module.https_sg.security_group_id,
