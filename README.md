@@ -93,6 +93,8 @@ Host private-isu-isucon
 ## 注意点
 - VPCとサブネットは作成していないのでデフォルトのものを用いている
 - private-isuに関しては競技者用インスタンスのAMIを用いている。
+- インスタンスタイプはc6i.large
+- regionはap-northeast-1
 
 
 
