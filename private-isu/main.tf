@@ -30,6 +30,19 @@ module "ssh_sg"{
   cidr_blocks = ["0.0.0.0/0"]
 }
 
+module "mysql_sg"{
+  source = "../module/security_group"
+  name = "mysql-sg"
+  port=3306
+  cidr_blocks = ["0.0.0.0/0"]
+}
+module "nginx_sg"{
+  source = "../module/security_group"
+  name = "nginx-sg"
+  port=8080
+  cidr_blocks = ["0.0.0.0/0"]
+}
+
 #インスタンスの個数
 variable "instance_count" {
   description = "Number of instances to create"
@@ -59,11 +72,26 @@ resource "aws_instance" "private-isu" {
   vpc_security_group_ids = [
     module.http_sg.security_group_id,
     module.https_sg.security_group_id,
-    module.ssh_sg.security_group_id
+    module.ssh_sg.security_group_id,
+    module.mysql_sg.security_group_id
   ]
   tags = {
     Name = "private-isu-${count.index}"
   }
+}
+
+resource "aws_instance" "private-isu-bench" {
+  ami             = "ami-0582a2a7fbe79a30d" # 適切なAMI IDを指定
+  instance_type   = "c6i.xlarge"
+  key_name               = aws_key_pair.isucon.id
+  vpc_security_group_ids = [
+    module.http_sg.security_group_id,
+    module.https_sg.security_group_id,
+    module.ssh_sg.security_group_id
+  ]
+    tags = {
+        Name = "private-isu-bench"
+    }
 }
 
 output "instance_public_ips" {
@@ -72,4 +100,7 @@ output "instance_public_ips" {
 
 output "instance_public_dns" {
   value = [for i in aws_instance.private-isu : i.public_dns]
+}
+output "bench_public_dns" {
+  value = aws_instance.private-isu-bench.public_dns
 }
