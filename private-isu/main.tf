@@ -130,6 +130,7 @@ resource "aws_instance" "private-isu" {
   count           = var.instance_count
   ami             = "ami-0d92a4724cae6f07b" # 適切なAMI IDを指定
   instance_type   = "c6i.large"
+  subnet_id = aws_subnet.private-isu-subnet1.id  # サブネットIDを追加
   key_name               = aws_key_pair.private-isu-key.id
   vpc_security_group_ids = [
     module.http_sg.security_group_id,
@@ -146,6 +147,7 @@ resource "aws_instance" "private-isu-bench" {
   ami             = "ami-0582a2a7fbe79a30d" # 適切なAMI IDを指定
   instance_type   = "c6i.xlarge"
   key_name               = aws_key_pair.private-isu-key.id
+  subnet_id = aws_subnet.private-isu-subnet1.id  # サブネットIDを追加
   vpc_security_group_ids = [
     module.http_sg.security_group_id,
     module.https_sg.security_group_id,
